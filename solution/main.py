@@ -32,6 +32,7 @@ Floats will only have 3 digits after the decimal point
 Ticks and tick intervalswill never be more than 4 digits long before the decimal point
 Longest continous string or integer is tick_interval and the UNIX timestamp respectively when working properly
 Duplicate data is still valuable data
+A dataset will only be valuable when both streams are non empty and not trash
 """
 
 def process_next_job():
