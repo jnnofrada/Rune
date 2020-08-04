@@ -5,10 +5,12 @@ log = logging.getLogger()
 logging.basicConfig(filename= 'tests.log', level=logging.DEBUG)
 print("start")
 
-f = open('settings.jsonlines', 'r', )
+f = open('settings.jsonlines', 'r')
+g = open('brushing.csv', 'r')
 settings = {}
 start = 0
 end = 0
+cur_tick = 0
 if f:
     x = f.readline()
     while x:
@@ -46,6 +48,19 @@ if f:
         log.debug(settings)
         z = settings["tick"]
         log.debug(z)
+        
+        # create db entry for the completed stream 2 line
+
+        # stream 1 iterate
+        z = g.readline()
+        brush_array = z.split(',')
+        cur_tick = z[0]
+        tooth = z[1]
+        pct = z[2]
+        if cur_tick < settings["tick"]:
+            stamp = settings["timestamp"] + (cur_tick * settings["tick_interval"])
+        
+        
         
         x = f.readline()
 
