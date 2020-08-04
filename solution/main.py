@@ -22,10 +22,6 @@ still something that writes to STDOUT or a file.
 
 logging.basicConfig(filename= 'test.log', level=logging.DEBUG)
 
-
-
-
-
 def process_next_job():
     """
     Uses JobQueue to get the next job, connects to LlamaDB, and ingests the
@@ -71,7 +67,11 @@ def process_next_job():
 
         """
         f = job.dataset.brushing.open_text()
+        if not f:
+            job.failed("Stream 2 cannot be opened")
         g = job.dataset.settings.open_text()
+        if not g:
+            job.failed("Stream 1 cannot be opened")
         settings = {}
         brush = {'pct': 0, 'cur_tick': 0, 'tooth': 0}
         start = 0
@@ -82,6 +82,8 @@ def process_next_job():
         prev_stamp = 0
         if f:
             x = f.readline()
+            if x is None:
+                job.failed("Stream 2 is empty")
             while x:
                 stamp = 0
                 y = 0
@@ -111,6 +113,8 @@ def process_next_job():
                         settings[meas] = val
                         meas = ""
                         val = None
+                if settings is None:
+                    job.failed("Stream 2 had trash input")
 
                 # stream 1 iterate
                 log.debug("Stream 1 iterate")
@@ -135,7 +139,10 @@ def process_next_job():
                     if passed == 2:
                         log.debug("seen once")
                         log.debug(z)
-                        brush_array = z.split(',')
+                        try:
+                            brush_array = z.split(',')
+                        except:
+                            job.failed("Separator in stream not found, trash input")
                         log.debug(brush_array)
                         brush["cur_tick"] = brush_array[0]
                         brush["tooth"] = brush_array[1]
@@ -166,11 +173,14 @@ def process_next_job():
                         log.debug("First pass complete z now equals first real line of stream 1")
                         passed += 1
                         z = g.readline()
+                        if g is None:
+                            job.failed("Stream 1 is empty")
                 prev_interval = settings["tick_interval"]
                 x = f.readline()
 
         else:
             log.error("not open")
+            job.failed("Stream 2 cannot be opened")
     
         end = settings["timestamp"]
         log.info("start stamp")
@@ -185,15 +195,7 @@ def process_next_job():
         g.close()
         # close connection to db
         db.close()
-
-        """
-        returns t_start as measured where the tick in the update is zero
-        returns t_end as measured in the last entry in stream 2 being the final update for the entire job
-        returns time_lost as measured as the sum of differences between the timestamps of each tick
-        will need to translate each file open to stream open_text but it also acts as file.readline()
-        pass dataset_id and toothbrush_id into here to create db entries
-
-        """
+        job.commit()
 
     
     raise NotImplementedError()
