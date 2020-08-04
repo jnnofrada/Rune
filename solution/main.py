@@ -22,6 +22,17 @@ still something that writes to STDOUT or a file.
 
 logging.basicConfig(filename= 'test.log', level=logging.DEBUG)
 
+"""
+Some assumptions made:
+Stream 2 will always have the start and end updates
+Tick 0 will always be the starting tick
+JSON and CSV will not skip lines when capturing data
+Device will make final update before turning off or running out of battery
+Floats will only have 3 digits after the decimal point
+Ticks and tick intervalswill never be more than 4 digits long before the decimal point
+Longest continous string or integer is tick_interval and the UNIX timestamp when working properly
+"""
+
 def process_next_job():
     """
     Uses JobQueue to get the next job, connects to LlamaDB, and ingests the
