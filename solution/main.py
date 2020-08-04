@@ -30,7 +30,7 @@ JSON and CSV will not skip lines when capturing data
 Device will make final update before turning off or running out of battery
 Floats will only have 3 digits after the decimal point
 Ticks and tick intervalswill never be more than 4 digits long before the decimal point
-Longest continous string or integer is tick_interval and the UNIX timestamp when working properly
+Longest continous string or integer is tick_interval and the UNIX timestamp respectively when working properly
 Duplicate data is still valuable data
 """
 
