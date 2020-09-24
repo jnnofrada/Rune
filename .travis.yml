@@ -2,9 +2,16 @@ language: python
 python:
   - "2.7"
   - "3.8"
-# command to install dependencies
-#install:
-#  - pip install -r requirements.txt
-# command to run tests
+install:
+  - bin/install_dependencies.sh
+
+#before_script:
+  # We source here since texlive manager state is required
+#  - source bin/install_dependencies
+
 script:
-  - echo "Test Travis"
+  - bin/test.sh
+  - bin/build.sh
+
+after_success:
+  - bin/deploy.sh
